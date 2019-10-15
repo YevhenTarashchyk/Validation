@@ -1,175 +1,175 @@
-import React from "react";
-import "./App.css";
+import React, { Component } from "react";
 import { withFormik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Error from "./Error";
-import Autosuggest from "react-autosuggest";
-import axios from "axios";
+import { connect } from "react-redux";
 
-const App = ({ values, errors, touched, isSubmitting }) => {
-  const [country, setCountry] = React.useState("");
-  const [suggestions, setSuggestions] = React.useState([]);
-  return (
-    <div className="wrapper">
-      <div className="form-wrapper">
-        <h1>Create Account</h1>
-        <Form>
-          <div className="firstName">
-            <label>First Name</label>
-            <Field
-              type="text"
-              noValidate
-              placeholder="First Name"
-              name="firstName"
-              autoComplete="off"
-              className={
-                touched.firstName && errors.firstName ? "has-error" : null
-              }
-            />
-            <Error clicked={touched.firstName} message={errors.firstName} />
-          </div>
-          <div className="lastName">
-            <label>Last Name</label>
-            <Field
-              type="text"
-              placeholder="Last Name"
-              name="lastName"
-              autoComplete="off"
-              className={
-                touched.lastName && errors.lastName ? "has-error" : null
-              }
-            />
-            <Error clicked={touched.lastName} message={errors.lastName} />
-          </div>
-          <div style={{ width: "40%" }}>
-            <div style={{ marginBottom: "15px" }}>
-              <div className="gender">
-                <label>
-                  <Field
-                    id="Male"
-                    name="gender"
-                    component="input"
-                    type="radio"
-                    value="male"
-                    checked={values.gender === "male"}
-                  />
-                  Male
-                </label>
-                <label>
-                  <Field
-                    id="Female"
-                    name="gender"
-                    component="input"
-                    type="radio"
-                    value="female"
-                    checked={values.gender === "female"}
-                  />
-                  Female
-                </label>
-              </div>
-              <Error clicked={touched.gender} message={errors.gender} />
-            </div>
-          </div>
-          <div className="age">
-            <label>Your Age</label>
-            <Field
-              type="text"
-              autoComplete="off"
-              placeholder="Age"
-              name="age"
-              className={touched.age && errors.age ? "has-error" : null}
-            />
-            <Error clicked={touched.age} message={errors.age} />
-          </div>
+import "./App.css";
+import { itemsFetchData } from "./actions/actions";
+import Autocomplete from "./components/Autocomplete";
 
-          <div className="countrySelect">
-            <label htmlFor="country">Country</label>
-            <Autosuggest
-              inputProps={{
-                id: "country",
-                autoComplete: "off",
-                placeholder: "Country",
-                name: "country",
-                value: country,
-                onChange: (_event, { newValue }) => {
-                  setCountry(newValue);
-                }
-              }}
-              suggestions={suggestions}
-              onSuggestionsFetchRequested={async ({ value }) => {
-                if (!value) {
-                  setSuggestions([]);
-                  return;
-                }
-              }}
-              onSuggestionsClearRequested={() => {
-                setSuggestions([]);
-              }}
-              getSuggestionValue={suggestion => suggestion.name}
-              renderSuggestion={suggestion => <div>{suggestion.name}</div>}
-            />
-            {/* <Field
-              type="text"
-              autoComplete="off"
-              placeholder="Age"
-              name="age"
-              className={touched.age && errors.age ? "has-error" : null}
-            />
-            <Error clicked={touched.age} message={errors.age} /> */}
-          </div>
+class App extends Component {
+  state = {
+    country: ""
+  };
 
-          <div className="email">
-            <label>Email</label>
-            <Field
-              autoComplete="off"
-              type="email"
-              placeholder="Email"
-              name="email"
-              className={touched.email && errors.email ? "has-error" : null}
-            />
-            <Error clicked={touched.email} message={errors.email} />
-          </div>
-          <div className="password">
-            <label>Password</label>
-            <Field
-              autoComplete="off"
-              type="password"
-              placeholder="Password"
-              name="password"
-              className={
-                touched.password && errors.password ? "has-error" : null
-              }
-            />
-            <Error clicked={touched.password} message={errors.password} />
-          </div>
-          <div className="subcribtionType">
-            <Field component="select" name="plan">
-              <option value="free">Free</option>
-              <option value="premium">Premium</option>
-            </Field>
-          </div>
-          <div className="newsletter">
-            <label>
+  componentDidMount() {
+    this.props.itemsFetchData();
+  }
+  handleChange = e => {
+    this.setState({
+      country: e.target.value
+    });
+  };
+
+  handleChoose = country => {
+    this.setState({
+      country
+    });
+  };
+  render() {
+    const { values, errors, touched, isSubmitting } = this.props;
+    return (
+      <div className="wrapper">
+        <div className="form-wrapper">
+          <h1>Create Account</h1>
+          <Form>
+            <div className="firstName">
+              <label>First Name</label>
               <Field
-                type="checkbox"
-                name="newsletter"
-                checked={values.newsletter}
+                type="text"
+                noValidate
+                placeholder="First Name"
+                name="firstName"
+                autoComplete="off"
+                className={
+                  touched.firstName && errors.firstName ? "has-error" : null
+                }
               />
-              Subcribe for letters
-            </label>
-          </div>
 
-          <div className="createAccount">
-            <button disabled={isSubmitting} type="submit">
-              Create Account
-            </button>
-            <small>Already have an account?</small>
-          </div>
-        </Form>
+              <Error values={values.firstName} message={errors.firstName} />
+            </div>
+            <div className="lastName">
+              <label>Last Name</label>
+              <Field
+                type="text"
+                placeholder="Last Name"
+                name="lastName"
+                autoComplete="off"
+                className={
+                  touched.lastName && errors.lastName ? "has-error" : null
+                }
+              />
+              <Error values={values.lastName} message={errors.lastName} />
+            </div>
+            <div style={{ width: "40%" }}>
+              <div style={{ marginBottom: "15px" }}>
+                <div className="gender">
+                  <label>
+                    <Field
+                      id="Male"
+                      name="gender"
+                      component="input"
+                      type="radio"
+                      value="male"
+                      checked={values.gender === "male"}
+                    />
+                    Male
+                  </label>
+                  <label>
+                    <Field
+                      id="Female"
+                      name="gender"
+                      component="input"
+                      type="radio"
+                      value="female"
+                      checked={values.gender === "female"}
+                    />
+                    Female
+                  </label>
+                </div>
+                <Error values={values.gender} message={errors.gender} />
+              </div>
+            </div>
+            <div className="age">
+              <label>Your Age</label>
+              {/* {JSON.stringify(values.age)} */}
+              <Field
+                type="text"
+                autoComplete="off"
+                placeholder="Age"
+                name="age"
+                className={touched.age && errors.age ? "has-error" : null}
+              />
+              <Error values={values.age} message={errors.age} />
+            </div>
+
+            <div className="countrySelect">
+              <label>Country</label>
+
+              <Autocomplete
+                name="country"
+                options={this.props.countries.countries}
+                onChange={this.handleChange}
+                maxVisibleOptions={4}
+                optionsHeight={25}
+                onChoose={this.handleChoose}
+              />
+            </div>
+
+            <div className="email">
+              <label>Email</label>
+              <Field
+                autoComplete="off"
+                type="email"
+                placeholder="Email"
+                name="email"
+                className={touched.email && errors.email ? "has-error" : null}
+              />
+              <Error values={values.email} message={errors.email} />
+            </div>
+            <div className="password">
+              <label>Password</label>
+              <Field
+                autoComplete="off"
+                type="password"
+                placeholder="Password"
+                name="password"
+                className={
+                  touched.password && errors.password ? "has-error" : null
+                }
+              />
+              <Error values={values.password} message={errors.password} />
+            </div>
+            <div className="subcribtionType">
+              <Field component="select" name="plan">
+                <option value="free">Free</option>
+                <option value="premium">Premium</option>
+              </Field>
+            </div>
+            <div className="newsletter">
+              <label>
+                <Field
+                  type="checkbox"
+                  name="newsletter"
+                  checked={values.newsletter}
+                />
+                Subcribe for letters
+              </label>
+            </div>
+
+            <div className="createAccount">
+              <button disabled={isSubmitting} type="submit">
+                Create Account
+              </button>
+              <small>Already have an account?</small>
+            </div>
+          </Form>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
 const FormikApp = withFormik({
   mapPropsToValues({
@@ -186,8 +186,8 @@ const FormikApp = withFormik({
       firstName: firstName || "",
       lastName: lastName || "",
       email: email || "",
-      password: password || "",
       newsletter: newsletter || false,
+      password: password || "",
       gender: gender || "",
       plan: plan || "free",
       age: age || ""
@@ -223,13 +223,23 @@ const FormikApp = withFormik({
     setTimeout(() => {
       if (values.email === "noyal70@yandex.ru") {
         setErrors({ email: "That email has been already registered" });
+        setSubmitting(false);
       } else {
         console.log(values);
         resetForm();
         setSubmitting(false);
       }
-    }, 3000);
+    }, 1500);
   }
 })(App);
 
-export default FormikApp;
+const mapStateToProps = state => ({
+  countries: state.countries
+});
+const mapDispatchToProps = {
+  itemsFetchData
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(FormikApp);

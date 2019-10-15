@@ -1,10 +1,12 @@
 import React from "react";
 
-const Error = ({ clicked, message }) => {
-  if (!clicked || message) {
+const Error = ({ values, message }) => {
+  if (message) {
     return <div className="form-message invalid">{message}</div>;
+  } else if (!message && values) {
+    return <div className="form-message valid">good</div>;
+  } else {
+    return false;
   }
-  return <div className="form-message valid">good</div>;
 };
-
 export default Error;
